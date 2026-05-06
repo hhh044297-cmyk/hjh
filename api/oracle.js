@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     const prompt = req.body.prompt;
 
     // 绝对正确的官方稳定版地址，去掉了所有可能引起歧义的拼接
-    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey;
+    const url = https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey};
 
     const payload = {
         contents: [{ parts: [{ text: prompt }] }],

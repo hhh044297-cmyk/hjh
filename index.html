@@ -408,7 +408,7 @@
         const indicatorEl = document.getElementById('indicator');
         const loadingMsg = document.getElementById('loading-msg');
 
-        async function fetchGeminiWithBackoff(prompt, maxRetries = 5) {
+        async function fetchGeminiWithBackoff(prompt, maxRetries = 1) {
             // 请求我们自己的 Vercel 免费后端接口，不再直接请求 Google，完美避开国内网络限制
             const url = `/api/oracle`; 
             

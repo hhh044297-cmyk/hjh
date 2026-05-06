@@ -409,60 +409,32 @@
         const loadingMsg = document.getElementById('loading-msg');
 
         async function fetchGeminiWithBackoff(prompt, maxRetries = 5) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                systemInstruction: {
-                    parts: [{
-                        text: "你是一位精通东方美学、汉字解构与色彩心理学的大师。用户输入一个中文名字和心境。你需要将名字拆分为两部分（比如单字名拆成姓和名，双字名拆成姓氏和名字）。为每个部分赋予深度的美学解读，并挑选一个代表该气质的高级感十六进制颜色代码(HEX，须为暗底易读的明度，如 #5C7A99)。最后生成充满诗意的人生判词。严格按JSON格式输出。"
-                    }]
-                },
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "OBJECT",
-                        properties: {
-                            subtitle: { type: "STRING", description: "四字或六字美学定调，如'渊水流深'" },
-                            part1: {
-                                type: "OBJECT",
-                                properties: {
-                                    text: { type: "STRING", description: "名字的第一部分(如姓氏)" },
-                                    concept: { type: "STRING", description: "两字意象，如'渊静'" },
-                                    colorHex: { type: "STRING", description: "高级感HEX颜色代码" },
-                                    desc: { type: "STRING", description: "该部分的深度美学解析，约30字" }
-                                }
-                            },
-                            part2: {
-                                type: "OBJECT",
-                                properties: {
-                                    text: { type: "STRING", description: "名字的第二部分" },
-                                    concept: { type: "STRING", description: "两字意象，如'华彩'" },
-                                    colorHex: { type: "STRING", description: "另一高级感HEX颜色代码" },
-                                    desc: { type: "STRING", description: "该部分的深度美学解析，约30字" }
-                                }
-                            },
-                            synthesisTitle: { type: "STRING", description: "如'吴以立基，斐以修神'" },
-                            synthesisDesc: { type: "STRING", description: "两股力量交融的哲学总结" },
-                            blessing: { type: "STRING", description: "三句或四句古风诗意寄语，用<br>分隔" }
-                        },
-                        required: ["subtitle", "part1", "part2", "synthesisTitle", "synthesisDesc", "blessing"]
-                    }
-                }
-            };
-
-            let retries = 0; const delays = [1000, 2000, 4000, 8000];
+            // 请求我们自己的 Vercel 免费后端接口，不再直接请求 Google，完美避开国内网络限制
+            const url = `/api/oracle`; 
+            
+            let retries = 0; 
+            const delays = [1000, 2000, 4000, 8000];
+            
             while (retries <= maxRetries) {
                 try {
-                    const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    const response = await fetch(url, { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify({ prompt: prompt }) 
+                    });
+                    
                     if (!response.ok) throw new Error(`HTTP error`);
+                    
                     const data = await response.json();
                     return JSON.parse(data.candidates[0].content.parts[0].text);
                 } catch (error) {
                     if (retries === maxRetries) return null;
-                    await new Promise(r => setTimeout(r, delays[retries])); retries++;
+                    await new Promise(r => setTimeout(r, delays[retries])); 
+                    retries++;
                 }
             }
         }
+
 
         // 动态构建 HTML 幻灯片并注入
         function buildPresentation(data) {

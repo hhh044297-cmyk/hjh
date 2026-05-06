@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     const prompt = req.body.prompt;
 
     // 1. 更换为额度最充裕的 Lite 模型
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`;
+   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${apiKey}`;
 
     const payload = {
         contents: [{ parts: [{ text: prompt }] }],
